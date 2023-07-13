@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <cstdlib>
 #include <SDL2/SDL.h>
 
 bool init();
@@ -93,7 +94,11 @@ int main()
 
         int spacing = 40;
         SDL_Rect rect = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, spacing, spacing};
-        int moveVal = 10;
+        int speed = 5;
+        struct {
+            int x = 1;
+            int y = 0;
+        } direction;
         const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 
         while(!quit)
@@ -109,36 +114,46 @@ int main()
             // process keyboard input
             if (currentKeyStates[SDL_SCANCODE_W])
             {
-                rect.y -= moveVal;
+                direction = {0, -1};
             }
 
             if (currentKeyStates[SDL_SCANCODE_S])
             {
-                rect.y += moveVal;
+                direction = {0, 1};
             }
 
             if (currentKeyStates[SDL_SCANCODE_A])
             {
-                rect.x -= moveVal;
+                direction = {-1, 0};
             }
 
             if (currentKeyStates[SDL_SCANCODE_D])
             {
-                rect.x += moveVal;
+                direction = {1, 0};
             }
+
+            // update position
+            rect.x += direction.x * speed;
+            rect.y += direction.y * speed;
+
+            // clamp rect position
+            if (rect.x > 0){ rect.x = rect.x % SCREEN_WIDTH; }
+            else if (rect.x < 0) { rect.x = SCREEN_WIDTH - rect.w; }
+            if (rect.y > 0){ rect.y = rect.y % SCREEN_HEIGHT; }
+            else if (rect.y < 0) { rect.y = SCREEN_HEIGHT - rect.h; }
 
             // clear screen
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF); // black
             SDL_RenderClear(gRenderer);
 
             // draw grid lines
-            SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF); // white
-            for(int i = spacing; i < SCREEN_WIDTH; i+= spacing){
-                SDL_RenderDrawLine(gRenderer, i, 0, i, SCREEN_HEIGHT);
-            }
-            for(int j = spacing; j < SCREEN_HEIGHT; j += spacing){
-                SDL_RenderDrawLine(gRenderer, 0, j, SCREEN_WIDTH, j);
-            }
+            //SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF); // white
+            //for(int i = spacing; i < SCREEN_WIDTH; i+= spacing){
+            //    SDL_RenderDrawLine(gRenderer, i, 0, i, SCREEN_HEIGHT);
+            //}
+            //for(int j = spacing; j < SCREEN_HEIGHT; j += spacing){
+            //    SDL_RenderDrawLine(gRenderer, 0, j, SCREEN_WIDTH, j);
+            //}
 
             //create green rectangle
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF); // green
