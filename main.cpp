@@ -91,15 +91,50 @@ int main()
         // SDL event handler
         SDL_Event event;
 
+
+        SDL_Rect rect = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100, 200};
+        int moveVal = 10;
+        const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
+
         while(!quit)
         {
             // process event queue
             while (SDL_PollEvent(&event) != 0)
             {
                 if (event.type == SDL_QUIT) {quit = true;}
+                
             }
 
+            currentKeyStates = SDL_GetKeyboardState(NULL);
+            // process keyboard input
+            if (currentKeyStates[SDL_SCANCODE_W])
+            {
+                rect.y -= moveVal;
+            }
+
+            if (currentKeyStates[SDL_SCANCODE_S])
+            {
+                rect.y += moveVal;
+            }
+
+            if (currentKeyStates[SDL_SCANCODE_A])
+            {
+                rect.x -= moveVal;
+            }
+
+            if (currentKeyStates[SDL_SCANCODE_D])
+            {
+                rect.x += moveVal;
+            }
+
+            // clear screen
+            SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF); // black
             SDL_RenderClear(gRenderer);
+
+            //create green rectangle
+            SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF); // green
+            SDL_RenderFillRect(gRenderer, &rect);
+
             SDL_RenderPresent(gRenderer);
         }
     }
