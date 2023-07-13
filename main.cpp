@@ -91,8 +91,8 @@ int main()
         // SDL event handler
         SDL_Event event;
 
-
-        SDL_Rect rect = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100, 200};
+        int spacing = 40;
+        SDL_Rect rect = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, spacing, spacing};
         int moveVal = 10;
         const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 
@@ -130,6 +130,15 @@ int main()
             // clear screen
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF); // black
             SDL_RenderClear(gRenderer);
+
+            // draw grid lines
+            SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF); // white
+            for(int i = spacing; i < SCREEN_WIDTH; i+= spacing){
+                SDL_RenderDrawLine(gRenderer, i, 0, i, SCREEN_HEIGHT);
+            }
+            for(int j = spacing; j < SCREEN_HEIGHT; j += spacing){
+                SDL_RenderDrawLine(gRenderer, 0, j, SCREEN_WIDTH, j);
+            }
 
             //create green rectangle
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF); // green
