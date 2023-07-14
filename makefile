@@ -1,5 +1,5 @@
 # OBJS specifies which files to compile as part of the project
-OBJS = main.cpp
+OBJS = main.cpp utils.cpp
 
 
 # CC specifies which complier to use
