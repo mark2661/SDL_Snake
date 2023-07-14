@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <cstdlib>
+#include <stdlib.h>
 #include <cmath>
 #include <list>
 #include <SDL2/SDL.h>
@@ -229,7 +230,31 @@ int main()
                 int newX = (direction.x != 0) ? snake.front().rect.x + (spacing * -1 * direction.x) : snake.front().rect.x;
                 int newY = (direction.y != 0) ? snake.front().rect.y + (spacing * -1 * direction.y) : snake.front().rect.y;
                 snake.push_front((body){newX, newY, spacing, spacing});
-                stop_eat_check = true; // temporary hack code to stop conditional after first execution.
+
+
+                // find new location for food rect (any cell unocupied by snake)
+                bool cell_found = false;
+                int cellX = -1;
+                int cellY = -1;
+                while (!cell_found){
+                    int hRange = SCREEN_WIDTH / spacing;
+                    int vRange = SCREEN_HEIGHT / spacing;
+                    printf("Horizontal squares: %d\n", hRange);
+                    printf("Vertical squares: %d\n", vRange);
+                    int hGuess = rand() % hRange;
+                    int vGuess = rand() % vRange;
+                    cellX = hGuess * spacing; 
+                    cellY = vGuess * spacing; 
+
+                    for(auto body_segment: snake){
+                        if (body_segment.rect.x == cellX and body_segment.rect.y == cellY) { continue; }
+                    }
+                    cell_found = true;
+                }
+                int y = static_cast<int>(0 + spacing * pow(snake_food.scale, 2));
+                snake_food.rect.x = static_cast<int>(cellX + (spacing * pow(snake_food.scale, 2)));
+                snake_food.rect.y = static_cast<int>(cellY + (spacing * pow(snake_food.scale, 2)));
+                //stop_eat_check = true; // temporary hack code to stop conditional after first execution.
             }
             
 
@@ -247,10 +272,13 @@ int main()
             }
 
             // render food
-            if (!eaten){
-                SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF); // blue
-                SDL_RenderFillRect(gRenderer, &(snake_food.rect));
-            }
+            //if (!eaten){
+            //    SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF); // blue
+            //    SDL_RenderFillRect(gRenderer, &(snake_food.rect));
+            //}
+
+            SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF); // blue
+            SDL_RenderFillRect(gRenderer, &(snake_food.rect));
 
             // render snake
             for(it = snake.begin(); it != snake.end(); ++it){
