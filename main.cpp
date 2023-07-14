@@ -158,19 +158,22 @@ int main()
             // iterate through snake and update positions
             if (frame_count % 15 == 0)
             {
+                // update the head position
                 body old_head = snake.back();
                 body new_head;
                 new_head.is_head = true;
                 new_head.rect.x = old_head.rect.x + (direction.x * spacing);
                 new_head.rect.y = old_head.rect.y + (direction.y * spacing);
                 new_head.rect.w = old_head.rect.w;
-                new_head.rect.h = old_head.rect.w;
+                new_head.rect.h = old_head.rect.h;
 
+                // update body positions
                 for (it = snake.begin(); it != std::next(snake.end(), -1); ++it)
                 {
                     it->rect.x = std::next(it,1)->rect.x; 
                     it->rect.y = std::next(it,1)->rect.y;
                 }
+
                 // remove old head
                 snake.pop_back();
                 // add new head
@@ -181,22 +184,23 @@ int main()
 
             // bounds check
             // clamp rect position for each part of snake
-            for (it = snake.begin(); it != std::next(snake.end(), -1); ++it)
+            if (snake.back().rect.x > 0)
             {
-                if (rect.x > 0){ rect.x = rect.x % SCREEN_WIDTH; }
-                else if (rect.x < 0)
-                {
-                    rect.x = SCREEN_WIDTH - rect.w;
-                }
-                if (rect.y > 0)
-                {
-                    rect.y = rect.y % SCREEN_HEIGHT;
-                }
-                else if (rect.y < 0)
-                {
-                    rect.y = SCREEN_HEIGHT - rect.h;
-                }
+                snake.back().rect.x = snake.back().rect.x % SCREEN_WIDTH;
             }
+            else if (snake.back().rect.x < 0)
+            {
+                snake.back().rect.x = SCREEN_WIDTH - snake.back().rect.w;
+            }
+            if (snake.back().rect.y > 0)
+            {
+                snake.back().rect.y = snake.back().rect.y % SCREEN_HEIGHT;
+            }
+            else if (snake.back().rect.y < 0)
+            {
+                snake.back().rect.y = SCREEN_HEIGHT - snake.back().rect.h;
+            }
+            
 
             // clear screen
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF); // black
@@ -215,7 +219,6 @@ int main()
             for(it = snake.begin(); it != snake.end(); ++it){
                // set draw color 
                if (it->is_head){
-                //printf("head\n");
                 SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF); // red
                }
                else{
@@ -225,12 +228,8 @@ int main()
                SDL_RenderFillRect(gRenderer, &(it->rect));
             }
 
-            //SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF); // green
-            //SDL_RenderFillRect(gRenderer, &rect);
-
             // Render frame
             SDL_RenderPresent(gRenderer);
-            //print_list(snake);
         }
     }
     close();
