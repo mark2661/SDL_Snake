@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
 #include <list>
 #include <SDL2/SDL.h>
 #include "utils.hpp"
@@ -98,6 +99,12 @@ int main()
         int spacing = 40;
         SDL_Rect rect = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, spacing, spacing};
         int speed = 5;
+        // TODO: Add foot struct
+        struct food{
+            SDL_Rect rect;
+            float scale = 0.5f;
+        };
+
         struct body {
             SDL_Rect rect;
             bool is_head = false;
@@ -121,6 +128,17 @@ int main()
         snake.push_front(torso);
         snake.push_front(torso2);
         // end test snake
+
+
+        // test food
+        food snake_food;
+        int x = static_cast<int>(0 + spacing*pow(snake_food.scale,2)); // snake_food.scale ^ 2 centers coordinate
+        int y = static_cast<int>(0 + spacing*pow(snake_food.scale,2));
+        int w = static_cast<int>(spacing*snake_food.scale);
+        int h = static_cast<int>(spacing*snake_food.scale);
+        snake_food.rect = {x, y, w, h};
+
+        // end test food
 
         const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 
@@ -183,7 +201,7 @@ int main()
             frame_count++;
 
             // bounds check
-            // clamp rect position for each part of snake
+            // clamp rect position for snake head
             if (snake.back().rect.x > 0)
             {
                 snake.back().rect.x = snake.back().rect.x % SCREEN_WIDTH;
@@ -214,6 +232,10 @@ int main()
             for(int j = spacing; j < SCREEN_HEIGHT; j += spacing){
                 SDL_RenderDrawLine(gRenderer, 0, j, SCREEN_WIDTH, j);
             }
+
+            // render food
+            SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF); // blue
+            SDL_RenderFillRect(gRenderer, &(snake_food.rect));
 
             // render snake
             for(it = snake.begin(); it != snake.end(); ++it){
