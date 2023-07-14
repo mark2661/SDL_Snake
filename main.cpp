@@ -99,7 +99,6 @@ int main()
         int spacing = 40;
         SDL_Rect rect = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, spacing, spacing};
         int speed = 5;
-        // TODO: Add foot struct
         struct food{
             SDL_Rect rect;
             float scale = 0.5f;
@@ -137,6 +136,8 @@ int main()
         int w = static_cast<int>(spacing*snake_food.scale);
         int h = static_cast<int>(spacing*snake_food.scale);
         snake_food.rect = {x, y, w, h};
+        bool eaten = false;
+        bool stop_eat_check = false;
 
         // end test food
 
@@ -218,6 +219,18 @@ int main()
             {
                 snake.back().rect.y = SCREEN_HEIGHT - snake.back().rect.h;
             }
+
+
+            // check for collision between head and food
+
+            if (SDL_HasIntersection(&(snake.back().rect), &(snake_food.rect)) and !stop_eat_check){
+                eaten = true;
+                // add new body segment
+                int newX = (direction.x != 0) ? snake.front().rect.x + (spacing * -1 * direction.x) : snake.front().rect.x;
+                int newY = (direction.y != 0) ? snake.front().rect.y + (spacing * -1 * direction.y) : snake.front().rect.y;
+                snake.push_front((body){newX, newY, spacing, spacing});
+                stop_eat_check = true; // temporary hack code to stop conditional after first execution.
+            }
             
 
             // clear screen
@@ -234,8 +247,10 @@ int main()
             }
 
             // render food
-            SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF); // blue
-            SDL_RenderFillRect(gRenderer, &(snake_food.rect));
+            if (!eaten){
+                SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF); // blue
+                SDL_RenderFillRect(gRenderer, &(snake_food.rect));
+            }
 
             // render snake
             for(it = snake.begin(); it != snake.end(); ++it){
