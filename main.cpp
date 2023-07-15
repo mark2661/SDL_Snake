@@ -174,7 +174,6 @@ int main()
         int w = static_cast<int>(spacing*snake_food.scale);
         int h = static_cast<int>(spacing*snake_food.scale);
         snake_food.rect = {x, y, w, h};
-        bool eaten = false;
         // end test food
 
         const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
@@ -263,6 +262,7 @@ int main()
                 // iterate from tail to (head - 2) and check for collison with head (Game over condition)
                 for (it = snake.begin(); it != std::next(snake.end(), -2); ++it){
                     if (SDL_HasIntersection(&(snake.back().rect), &(it->rect))){
+                        // TODO: Transition to game over screen and display score
                         printf("Game Over!\nScore: %d\n", snake.size()-1);
                         quit = true;
                     }
@@ -271,7 +271,6 @@ int main()
                 // check for collision between head and food
                 if (SDL_HasIntersection(&(snake.back().rect), &(snake_food.rect)))
                 {
-                    eaten = true;
                     // add new body segment
                     // TODO: Fix bug mentioned below
                     // kind of buggy since direction refers to head direction not tail direction
@@ -285,6 +284,7 @@ int main()
                     int cellY = -1;
                     bool cell_found = false;
                     // Warning: currently NO end conditon!! always assumes empty cell is available for food
+                    // solution could be to iteratre through the grid_map before hand and check an unoccupied cell exist (i.e 0 in grid_map)
                     while (!cell_found)
                     {
                         // keep guessing random cells on the grid until a cell is found which is not occupied by a snake body element (i.e grid_map = 0
