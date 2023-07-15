@@ -129,7 +129,7 @@ int main()
         std::unordered_map<std::tuple<int,int>, int, hash_tuple> grid_map;
         int num_grid_rows = SCREEN_WIDTH / spacing;
         int num_grid_cols = SCREEN_HEIGHT / spacing;
-        // populate every cell with 0 (0 = unocupied cell, 1 = cell ocupied by snake body segment)
+        // populate every cell with 0 (0 = unoccupied cell, 1 = cell occupied by snake body segment)
         for (int r = 0; r < num_grid_rows; ++r){
             for (int c = 0; c < num_grid_cols; ++c){
                 grid_map[std::make_tuple(r, c)] = 0;
@@ -258,12 +258,17 @@ int main()
                 grid_map[getGridId(snake.back().rect.x, snake.back().rect.y, spacing)] = 1;
                 // set cell previously ocupied by the snake tail as unocupied (i.e = 0)
                 grid_map[getGridId(snake.front().rect.x, snake.front().rect.y, spacing)] = 0;
-            }
 
-            // check for collision between head and food
-            if (frame_count % speed == 0) // get for collisions with food on the same frame where the snake positions update 
-            // prevents somtimes beging placed in a location occupied by a snake body segment.
-            { 
+                // check for head/body collsiion 
+                // iterate from tail to (head - 2) and check for collison with head (Game over condition)
+                for (it = snake.begin(); it != std::next(snake.end(), -2); ++it){
+                    if (SDL_HasIntersection(&(snake.back().rect), &(it->rect))){
+                        printf("Game Over!\nScore: %d\n", snake.size()-1);
+                        quit = true;
+                    }
+                }
+
+                // check for collision between head and food
                 if (SDL_HasIntersection(&(snake.back().rect), &(snake_food.rect)))
                 {
                     eaten = true;
