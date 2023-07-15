@@ -4,11 +4,15 @@
 #include <stdlib.h>
 #include <cmath>
 #include <list>
+#include <tuple>
+#include <unordered_map>
 #include <SDL2/SDL.h>
 #include "utils.hpp"
 
 bool init();
 void close();
+std::tuple<int, int> getGridId(int, int, int);
+
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
@@ -82,6 +86,26 @@ void close()
     SDL_Quit();
 }
 
+std::tuple<int, int> getGridId(int x, int y, int spacing)
+{
+    int gridX = x / spacing;
+    int gridY = y / spacing;
+    
+    //return std::tuple<int, int> 
+    return std::make_tuple(gridX, gridY);
+}
+
+// std::unordered_map cannot does not define a hash for tuples, therefore must define a custom hash function.
+struct hash_tuple 
+{
+    template <class T1, class T2>
+
+    size_t operator()(const std::tuple<T1, T2>& x) const
+    {
+        return std::get<0>(x) ^ std::get<1>(x);
+    }
+
+};
 
 int main()
 {
@@ -96,10 +120,23 @@ int main()
         // SDL event handler
         SDL_Event event;
 
+        // settings
         unsigned char frame_count = 0;
         int spacing = 40;
-        SDL_Rect rect = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, spacing, spacing};
-        int speed = 5;
+        int speed = 15;
+
+        // Initialise grid hash map
+        std::unordered_map<std::tuple<int,int>, int, hash_tuple> grid_map;
+        int num_grid_rows = SCREEN_WIDTH / spacing;
+        int num_grid_cols = SCREEN_HEIGHT / spacing;
+        // populate every cell with 0 (0 = unocupied cell, 1 = cell ocupied by snake body segment)
+        for (int r = 0; r < num_grid_rows; ++r){
+            for (int c = 0; c < num_grid_cols; ++c){
+                grid_map[std::make_tuple(r, c)] = 0;
+            }
+        }
+        // end initialise grid hash map
+
         struct food{
             SDL_Rect rect;
             float scale = 0.5f;
@@ -119,14 +156,14 @@ int main()
         // test snake
         body head;
         body torso;
-        body torso2;
         head.rect = {SCREEN_WIDTH/2, SCREEN_HEIGHT/2, spacing, spacing};
         head.is_head = true;
         torso.rect = {head.rect.x-spacing, head.rect.y, spacing, spacing};
-        torso2.rect = {head.rect.x-(2*spacing), head.rect.y, spacing, spacing};
         snake.push_front(head);
         snake.push_front(torso);
-        snake.push_front(torso2);
+        // update grid map
+        grid_map[getGridId(head.rect.x, head.rect.y, spacing)] = 1;
+        grid_map[getGridId(torso.rect.x, torso.rect.y, spacing)] = 1;
         // end test snake
 
 
@@ -138,8 +175,6 @@ int main()
         int h = static_cast<int>(spacing*snake_food.scale);
         snake_food.rect = {x, y, w, h};
         bool eaten = false;
-        bool stop_eat_check = false;
-
         // end test food
 
         const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
@@ -176,7 +211,7 @@ int main()
             }
 
             // iterate through snake and update positions
-            if (frame_count % 15 == 0)
+            if (frame_count % speed == 0) // artificially slow down the movement update allow the snake to move cell by cell in the grid at a playable speed
             {
                 // update the head position
                 body old_head = snake.back();
@@ -199,64 +234,75 @@ int main()
                 // add new head
                 snake.push_back(new_head);
 
-            }
-            frame_count++;
+                // bounds check
+                // clamp rect position for snake head
+                if (snake.back().rect.x > 0)
+                {
+                    snake.back().rect.x = snake.back().rect.x % SCREEN_WIDTH;
+                }
+                else if (snake.back().rect.x < 0)
+                {
+                    snake.back().rect.x = SCREEN_WIDTH - snake.back().rect.w;
+                }
+                if (snake.back().rect.y > 0)
+                {
+                    snake.back().rect.y = snake.back().rect.y % SCREEN_HEIGHT;
+                }
+                else if (snake.back().rect.y < 0)
+                {
+                    snake.back().rect.y = SCREEN_HEIGHT - snake.back().rect.h;
+                }
 
-            // bounds check
-            // clamp rect position for snake head
-            if (snake.back().rect.x > 0)
-            {
-                snake.back().rect.x = snake.back().rect.x % SCREEN_WIDTH;
+                // update grid map
+                // update grid map with posiiton of new_head
+                grid_map[getGridId(snake.back().rect.x, snake.back().rect.y, spacing)] = 1;
+                // set cell previously ocupied by the snake tail as unocupied (i.e = 0)
+                grid_map[getGridId(snake.front().rect.x, snake.front().rect.y, spacing)] = 0;
             }
-            else if (snake.back().rect.x < 0)
-            {
-                snake.back().rect.x = SCREEN_WIDTH - snake.back().rect.w;
-            }
-            if (snake.back().rect.y > 0)
-            {
-                snake.back().rect.y = snake.back().rect.y % SCREEN_HEIGHT;
-            }
-            else if (snake.back().rect.y < 0)
-            {
-                snake.back().rect.y = SCREEN_HEIGHT - snake.back().rect.h;
-            }
-
 
             // check for collision between head and food
+            if (frame_count % speed == 0) // get for collisions with food on the same frame where the snake positions update 
+            // prevents somtimes beging placed in a location occupied by a snake body segment.
+            { 
+                if (SDL_HasIntersection(&(snake.back().rect), &(snake_food.rect)))
+                {
+                    eaten = true;
+                    // add new body segment
+                    // TODO: Fix bug mentioned below
+                    // kind of buggy since direction refers to head direction not tail direction
+                    int newX = (direction.x != 0) ? snake.front().rect.x + (spacing * -1 * direction.x) : snake.front().rect.x;
+                    int newY = (direction.y != 0) ? snake.front().rect.y + (spacing * -1 * direction.y) : snake.front().rect.y;
+                    snake.push_front((body){newX, newY, spacing, spacing});
+                    grid_map[getGridId(newX, newY, spacing)] = 1;
 
-            if (SDL_HasIntersection(&(snake.back().rect), &(snake_food.rect)) and !stop_eat_check){
-                eaten = true;
-                // add new body segment
-                int newX = (direction.x != 0) ? snake.front().rect.x + (spacing * -1 * direction.x) : snake.front().rect.x;
-                int newY = (direction.y != 0) ? snake.front().rect.y + (spacing * -1 * direction.y) : snake.front().rect.y;
-                snake.push_front((body){newX, newY, spacing, spacing});
+                    // find new location for food rect (any cell unocupied by snake)
+                    int cellX = -1;
+                    int cellY = -1;
+                    bool cell_found = false;
+                    // Warning: currently NO end conditon!! always assumes empty cell is available for food
+                    while (!cell_found)
+                    {
+                        // keep guessing random cells on the grid until a cell is found which is not occupied by a snake body element (i.e grid_map = 0
+                        // at that cell)
+                        int hRange = SCREEN_WIDTH / spacing;
+                        int vRange = SCREEN_HEIGHT / spacing;
+                        int hGuess = rand() % hRange;
+                        int vGuess = rand() % vRange;
 
-
-                // find new location for food rect (any cell unocupied by snake)
-                bool cell_found = false;
-                int cellX = -1;
-                int cellY = -1;
-                while (!cell_found){
-                    int hRange = SCREEN_WIDTH / spacing;
-                    int vRange = SCREEN_HEIGHT / spacing;
-                    printf("Horizontal squares: %d\n", hRange);
-                    printf("Vertical squares: %d\n", vRange);
-                    int hGuess = rand() % hRange;
-                    int vGuess = rand() % vRange;
-                    cellX = hGuess * spacing; 
-                    cellY = vGuess * spacing; 
-
-                    for(auto body_segment: snake){
-                        if (body_segment.rect.x == cellX and body_segment.rect.y == cellY) { continue; }
+                        if (grid_map.find(std::make_tuple(hGuess, vGuess)) != grid_map.end())
+                        {
+                            if (grid_map.at(std::make_tuple(hGuess, vGuess)) == 0)
+                            {
+                                cellX = hGuess * spacing;
+                                cellY = vGuess * spacing;
+                                cell_found = true; // break loop
+                            }
+                        }
                     }
-                    cell_found = true;
+                    snake_food.rect.x = static_cast<int>(cellX + (spacing * pow(snake_food.scale, 2)));
+                    snake_food.rect.y = static_cast<int>(cellY + (spacing * pow(snake_food.scale, 2)));
                 }
-                int y = static_cast<int>(0 + spacing * pow(snake_food.scale, 2));
-                snake_food.rect.x = static_cast<int>(cellX + (spacing * pow(snake_food.scale, 2)));
-                snake_food.rect.y = static_cast<int>(cellY + (spacing * pow(snake_food.scale, 2)));
-                //stop_eat_check = true; // temporary hack code to stop conditional after first execution.
             }
-            
 
             // clear screen
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF); // black
@@ -264,37 +310,38 @@ int main()
 
             // draw grid lines
             SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF); // white
-            for(int i = spacing; i < SCREEN_WIDTH; i+= spacing){
+            for (int i = spacing; i < SCREEN_WIDTH; i += spacing)
+            {
                 SDL_RenderDrawLine(gRenderer, i, 0, i, SCREEN_HEIGHT);
             }
-            for(int j = spacing; j < SCREEN_HEIGHT; j += spacing){
+            for (int j = spacing; j < SCREEN_HEIGHT; j += spacing)
+            {
                 SDL_RenderDrawLine(gRenderer, 0, j, SCREEN_WIDTH, j);
             }
 
             // render food
-            //if (!eaten){
-            //    SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF); // blue
-            //    SDL_RenderFillRect(gRenderer, &(snake_food.rect));
-            //}
-
             SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF); // blue
             SDL_RenderFillRect(gRenderer, &(snake_food.rect));
 
             // render snake
-            for(it = snake.begin(); it != snake.end(); ++it){
-               // set draw color 
-               if (it->is_head){
-                SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF); // red
-               }
-               else{
-                SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF); // green
-               }
-               // render rect
-               SDL_RenderFillRect(gRenderer, &(it->rect));
+            for (it = snake.begin(); it != snake.end(); ++it)
+            {
+                // set draw color
+                if (it->is_head)
+                {
+                    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF); // red
+                }
+                else
+                {
+                    SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF); // green
+                }
+                // render rect
+                SDL_RenderFillRect(gRenderer, &(it->rect));
             }
 
             // Render frame
             SDL_RenderPresent(gRenderer);
+            frame_count++;
         }
     }
     close();
