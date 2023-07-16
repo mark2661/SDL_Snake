@@ -20,3 +20,12 @@ struct hash_tuple
 
 };
 
+enum CustomReturnCode
+{
+    RUN,
+    QUIT,
+    START_MENU,
+    GAME_OVER_MENU,
+    GAME_SCREEN
+};
+

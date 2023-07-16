@@ -42,6 +42,7 @@ void Game::moveSnake()
     new_head.rect.h = old_head.rect.h;
 
     // update body positions
+    // each segment from the tail to the segment before the head takes the position of the segment in front of it.
     for (snake.snakeBodyIterator = snake.snakeBody.begin(); snake.snakeBodyIterator != std::next(snake.snakeBody.end(), -1); ++snake.snakeBodyIterator){
         snake.snakeBodyIterator->rect.x = std::next(snake.snakeBodyIterator,1)->rect.x;
         snake.snakeBodyIterator->rect.y = std::next(snake.snakeBodyIterator,1)->rect.y;
@@ -82,15 +83,17 @@ void Game::outOfBoundsCheck()
     this->grid_map[getGridId(snake.snakeBody.front().rect.x, snake.snakeBody.front().rect.y, this->gridSpacing)] = 0;
 }
 
-void Game::collisionCheck()
+bool Game::collisionCheck()
 {
     for (snake.snakeBodyIterator = snake.snakeBody.begin();
          snake.snakeBodyIterator != std::next(snake.snakeBody.end(), -2);
          ++snake.snakeBodyIterator){
             if (SDL_HasIntersection(&(snake.snakeBody.back().rect), &(snake.snakeBodyIterator->rect))){
                 printf("Game Over!\nScore: %d\n", snake.snakeBody.size()-1);
+                return true;
             }
          }
+    return false;
 }
 
 void Game::checkFoodConsumption()
@@ -113,7 +116,7 @@ void Game::respawnFood()
 
     while (!cell_found)
     {
-        // keep guessing random cells on the grid util an unoccupied cell is found (one not containing a snake body elememnt) (i.e grid_map = 0)
+        // keep guessing random cells on the grid until an unoccupied cell is found (one not containing a snake body elememnt) (i.e grid_map = 0)
         int hRange = this->screenWidth / this->gridSpacing;
         int vRange = this->screenHeight / this->gridSpacing;
         int hGuess = rand() % hRange;
@@ -139,11 +142,13 @@ void Game::renderGame(SDL_Renderer* renderer)
 
     // draw grid lines
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF); // white
+    // vertical grid lines
     for (int i = this->gridSpacing; i < this->screenWidth; i+=this->gridSpacing)
     {
         SDL_RenderDrawLine(renderer, i, 0, i, this->screenHeight);
     }
 
+    // horizontal grid lines
     for (int j = this->gridSpacing; j < this->screenHeight; j+=this->gridSpacing)
     {
         SDL_RenderDrawLine(renderer, 0, j, this->screenWidth, j);
@@ -179,14 +184,17 @@ void Game::processInput()
             }
 }
 
-void Game::run(SDL_Renderer* renderer, const int frameCount, const int speed)
+bool Game::run(SDL_Renderer* renderer, const int frameCount, const int speed)
 {
+    bool quitGame = false;
     processInput();
     if (frameCount % speed == 0)
     {
         moveSnake();
-        collisionCheck();
+        // if collision with body detected collisionCheck will return true and game will exit
+        quitGame = collisionCheck();
         checkFoodConsumption();
     }
     renderGame(renderer);
+    return quitGame;
 }

@@ -1,5 +1,5 @@
 # OBJS specifies which files to compile as part of the project
-OBJS = main.cpp utils.cpp Game.cpp Snake.cpp
+OBJS = main.cpp utils.cpp Game.cpp Snake.cpp ScreenManager.cpp ScreenInterface.cpp GameScreen.cpp MenuScreen.cpp Menu.cpp StartMenu.cpp
 
 
 # CC specifies which complier to use

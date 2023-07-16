@@ -13,6 +13,7 @@ struct Food{
 
     Food(int x, int y, int w, int h, const int spacing)
     {
+        // initialises food rect in the top left grid cell
         int init_x = static_cast<int>(0 + spacing*pow(this->scale,2)); // snake_food.scale ^ 2 centers coordinate
         int init_y = static_cast<int>(0 + spacing*pow(this->scale,2));
         int init_w = static_cast<int>(spacing*this->scale);
@@ -49,12 +50,12 @@ class Game
         void populateGrid();
         void moveSnake();
         void outOfBoundsCheck();
-        void collisionCheck();
+        bool collisionCheck();
         void checkFoodConsumption();
         void respawnFood();
         void renderGame(SDL_Renderer* renderer);
         void processInput();
-        void run(SDL_Renderer* renderer, const int frameCount, const int speed);
+        bool run(SDL_Renderer* renderer, const int frameCount, const int speed);
 
 };
 

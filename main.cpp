@@ -8,7 +8,8 @@
 #include <unordered_map>
 #include <SDL2/SDL.h>
 #include "utils.hpp"
-#include "Game.hpp"
+#include "ScreenManager.hpp"
+//#include "Game.hpp"
 
 bool init();
 void close();
@@ -103,7 +104,8 @@ int main()
         int spacing = 40;
         int speed = 15;
 
-        Game game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, spacing);
+        //Game game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, spacing);
+        ScreenManager screenManager = ScreenManager(SCREEN_WIDTH, SCREEN_HEIGHT);
 
         const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 
@@ -116,11 +118,10 @@ int main()
                 
             }
             
-            game.run(gRenderer, frame_count, speed);
+            quit = screenManager.run(gRenderer);
 
             // Render frame
             SDL_RenderPresent(gRenderer);
-            frame_count++;
         }
     }
     close();
