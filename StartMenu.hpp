@@ -1,8 +1,8 @@
 #pragma once
-#include "Menu.hpp"
+#include "MenuInterface.hpp"
 
 
-class StartMenu : Menu
+class StartMenu : MenuInterface
 {
     public:
         StartMenu();

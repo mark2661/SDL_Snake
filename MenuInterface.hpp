@@ -2,7 +2,7 @@
 #include <SDL2/SDL.h>
 #include "utils.hpp"
 
-class Menu 
+class MenuInterface 
 {
     public:
         //Menu();

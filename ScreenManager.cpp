@@ -15,7 +15,6 @@ void ScreenManager::switchScreen(const std::string screenCode)
 {
     if (screenCode == "GAME_SCREEN")
     {
-        //this->currentScreen = this->screens.at(screenCode).get();
         this->currentScreen = this->screens.at(screenCode);
     }
 
@@ -69,8 +68,8 @@ ScreenManager::~ScreenManager()
     // clear does not free up the memeory pointed to by pointers in the hashmap therefore that has been done manually above.
     screens.clear();
 
-    // since object currentScreen is pointing to is freeed in the for loop above there is no need to free it here.
-    // doing so will cause an exception. Instead point currentScrenn to NULL to avoid dangling pointer.
+    // since object currentScreen is pointing to is freed in the for loop above there is no need to free it here.
+    // doing so will cause an exception. Instead point currentScreen to NULL to avoid dangling pointer.
     //delete currentScreen;
     currentScreen = nullptr;
 }
