@@ -2,6 +2,7 @@
 //#include "ScreenManager.hpp"
 #include <cinttypes>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "utils.hpp"
 
 //class ScreenManager;
@@ -9,7 +10,6 @@
 class ScreenInterface
 {
     public:
-        //ScreenManager* manager;
         uint16_t windowWidth;
         uint16_t windowHeight;
 

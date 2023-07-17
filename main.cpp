@@ -7,9 +7,9 @@
 #include <tuple>
 #include <unordered_map>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "utils.hpp"
 #include "ScreenManager.hpp"
-//#include "Game.hpp"
 
 bool init();
 void close();
@@ -66,6 +66,13 @@ bool init()
             {
                 // initialise renderer colour
                 SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF); // black
+
+                // init TTF font
+                if (TTF_Init() == -1)
+                {
+                    printf("SDL_ttf could not initialise! SDL_ttf Error!: %s\n", TTF_GetError());
+                    success = false;
+                }
             }
         }
     }
@@ -83,6 +90,7 @@ void close()
     gWindow = nullptr;
 
 
+    TTF_Quit();
     SDL_Quit();
 }
 

@@ -1,5 +1,5 @@
 # OBJS specifies which files to compile as part of the project
-OBJS = main.cpp utils.cpp Game.cpp Snake.cpp ScreenManager.cpp ScreenInterface.cpp GameScreen.cpp MenuScreen.cpp MenuInterface.cpp StartMenu.cpp
+OBJS = main.cpp utils.cpp Game.cpp Snake.cpp ScreenManager.cpp ScreenInterface.cpp GameScreen.cpp MenuScreen.cpp MenuInterface.cpp StartMenu.cpp LTexture.cpp
 
 
 # CC specifies which complier to use
@@ -10,7 +10,7 @@ CC = g++
 COMPLIER_FLAGS = -w
 
 # LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lSDL2 -lSDL2_image
+LINKER_FLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf
 
 # OBJ_NAME specifies the name of the executable file
 OBJ_NAME = snake.exe

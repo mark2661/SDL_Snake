@@ -2,10 +2,6 @@
 #include "ScreenInterface.hpp"
 #include "Game.hpp"
 
-
-//class ScreenManager;
-//class ScreenInterface;
-
 class GameScreen : public ScreenInterface
 {
     public:

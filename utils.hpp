@@ -1,8 +1,12 @@
-# pragma once
+#pragma once
+#include <cstddef>
+#include <stdio.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <list>
 #include <tuple>
-#include <cstddef>
-
+#include <string>
+#include "LTexture.hpp"
 
 template <typename L>
 void print_list(std::list<L>);
@@ -20,6 +24,20 @@ struct hash_tuple
 
 };
 
+struct CustomTextWrapper{
+    std::string text = "";
+    TTF_Font* font;
+    SDL_Color colour = {0x00, 0x00, 0x00}; // black
+    LTexture texture;
+
+    CustomTextWrapper();
+    CustomTextWrapper(std::string text, TTF_Font *font, SDL_Color colour);
+    void setFont(unsigned char fontSize);
+    void renderText(const int x, const int y, SDL_Renderer* renderer);
+    ~CustomTextWrapper();
+};
+
+
 enum CustomReturnCode
 {
     RUN,
@@ -28,4 +46,5 @@ enum CustomReturnCode
     GAME_OVER_MENU,
     GAME_SCREEN
 };
+
 

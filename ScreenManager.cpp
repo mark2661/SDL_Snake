@@ -5,6 +5,7 @@ ScreenManager::ScreenManager() {}
 
 ScreenManager::ScreenManager(const uint16_t windowWidth, const uint16_t windowHeight)
 {
+    // screens
     this->screens.insert({"GAME_SCREEN", new GameScreen(windowWidth, windowHeight)});
     this->screens.insert({"MENU_SCREEN", new MenuScreen(windowWidth, windowHeight)});
     //this->currentScreen = this->screens.at("GAME_SCREEN");
@@ -17,10 +18,12 @@ void ScreenManager::switchScreen(const std::string screenCode)
     {
         this->currentScreen = this->screens.at(screenCode);
     }
+    // TODO: add rest of screen transition logic
 
     return;
 }
 
+//bool ScreenManager::run(SDL_Renderer* renderer)
 bool ScreenManager::run(SDL_Renderer* renderer)
 {
     bool quit = true;

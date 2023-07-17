@@ -13,6 +13,7 @@ GameScreen:: GameScreen(const uint16_t windowWidth, const uint16_t windowHeight,
 
 CustomReturnCode GameScreen::run(SDL_Renderer* renderer)
 {
+
     bool quitGame = false;
     quitGame = this->game.run(renderer, this->frameCount, this->gameSpeed);
     this->frameCount += 1;

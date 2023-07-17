@@ -10,5 +10,5 @@ MenuScreen::MenuScreen(const uint16_t windowWidth, const uint16_t windowHeight) 
 
 CustomReturnCode MenuScreen::run(SDL_Renderer* renderer)
 {
-    return menu.run(renderer);
+    return menu.run(renderer, this->windowWidth, this->windowHeight);
 }
