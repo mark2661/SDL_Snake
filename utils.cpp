@@ -44,7 +44,21 @@ void CustomTextWrapper::setFont(unsigned char fontSize)
 void CustomTextWrapper::renderText(const int x, const int y, SDL_Renderer *renderer)
 {
     this->texture.loadFromRenderedText(this->text, this->colour, this->font, renderer);
+    this->boundingRect = {x, y, this->texture.getWidth(), this->texture.getHeight()};
     this->texture.render(x, y, renderer, NULL);
+}
+
+void CustomTextWrapper::renderTextCentered(const uint16_t windowWidth, const uint16_t y, SDL_Renderer* renderer)
+{
+    this->texture.loadFromRenderedText(this->text, this->colour, this->font, renderer);
+    int x = static_cast<int>(0.5f * (windowWidth - this->texture.getWidth()));
+    this->boundingRect = {x, y, this->texture.getWidth(), this->texture.getHeight()};
+    this->texture.render(this->boundingRect.x, this->boundingRect.y, renderer, NULL);
+}
+
+CustomReturnCode onClick()
+{
+    return QUIT;
 }
 
 CustomTextWrapper::~CustomTextWrapper()

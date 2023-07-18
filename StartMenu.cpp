@@ -9,7 +9,8 @@ StartMenu::StartMenu()
         printf("Error could not load font: TTF Error!: %s\n", TTF_GetError());
     }
 
-    this->title = CustomTextWrapper("Place holder title text", titleFont, {0xFF, 0x00, 0x00});
+    // Add options text to menu
+    this->options.push_back(CustomTextWrapper("Place holder title text", titleFont, {0xFF, 0x00, 0x00}));
 }
 
 CustomReturnCode StartMenu::processInputs()
@@ -30,8 +31,12 @@ void StartMenu::render(SDL_Renderer* renderer, const uint16_t windowWidth, const
     SDL_SetRenderDrawColor(renderer, 0xA0, 0xA0, 0xA0, 0xFF); // grey
     SDL_RenderClear(renderer);
 
-    // render text
-    this->title.renderText(windowWidth / 4, windowHeight / 4, renderer);
+    // render option list text
+    for (CustomTextWrapper option: this->options)
+    {
+        //option.renderText(windowWidth/4, windowHeight/4, renderer);
+        option.renderTextCentered(windowWidth, windowHeight/4, renderer);
+    }
 }
 
 CustomReturnCode StartMenu::run(SDL_Renderer* renderer, const uint16_t windowWidth, const uint16_t windowHeight)

@@ -5,7 +5,7 @@
 class StartMenu : MenuInterface
 {
     public:
-        CustomTextWrapper title;
+        std::vector<CustomTextWrapper> options;
         StartMenu();
         CustomReturnCode processInputs();
         void render(SDL_Renderer* renderer, const uint16_t windowWidth, const uint16_t windowHeight);

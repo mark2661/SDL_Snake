@@ -24,20 +24,6 @@ struct hash_tuple
 
 };
 
-struct CustomTextWrapper{
-    std::string text = "";
-    TTF_Font* font;
-    SDL_Color colour = {0x00, 0x00, 0x00}; // black
-    LTexture texture;
-
-    CustomTextWrapper();
-    CustomTextWrapper(std::string text, TTF_Font *font, SDL_Color colour);
-    void setFont(unsigned char fontSize);
-    void renderText(const int x, const int y, SDL_Renderer* renderer);
-    ~CustomTextWrapper();
-};
-
-
 enum CustomReturnCode
 {
     RUN,
@@ -45,6 +31,24 @@ enum CustomReturnCode
     START_MENU,
     GAME_OVER_MENU,
     GAME_SCREEN
+};
+
+
+
+struct CustomTextWrapper{
+    std::string text = "";
+    TTF_Font* font;
+    SDL_Color colour = {0x00, 0x00, 0x00}; // black
+    LTexture texture;
+    SDL_Rect boundingRect;
+
+    CustomTextWrapper();
+    CustomTextWrapper(std::string text, TTF_Font *font, SDL_Color colour);
+    void setFont(unsigned char fontSize);
+    void renderText(const int x, const int y, SDL_Renderer* renderer);
+    void renderTextCentered(const uint16_t windowWidth, const uint16_t y, SDL_Renderer* renderer);
+    CustomReturnCode onClick();
+    ~CustomTextWrapper();
 };
 
 
