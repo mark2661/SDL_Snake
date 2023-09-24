@@ -193,6 +193,7 @@ bool Game::run(SDL_Renderer* renderer, const int frameCount, const int speed)
         moveSnake();
         // if collision with body detected collisionCheck will return true and game will exit
         quitGame = collisionCheck();
+        std::cout << "Collision Check: " << collisionCheck() << std::endl;
         checkFoodConsumption();
     }
     renderGame(renderer);

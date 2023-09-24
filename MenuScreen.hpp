@@ -9,6 +9,9 @@ class MenuScreen : public ScreenInterface
         StartMenu menu;
         MenuScreen();
         MenuScreen(const uint16_t windowWidth, const uint16_t windowHeight);
+        void processInputs();
         CustomReturnCode run(SDL_Renderer* renderer);
+        CustomReturnCode run(SDL_Renderer* renderer, const int mouseX, const int mouseY);
+        ~MenuScreen();
 
 };

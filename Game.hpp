@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <tuple>
 #include <cmath>
+#include <iostream>
 #include "utils.hpp"
 #include "Snake.hpp"
 

@@ -9,7 +9,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include "utils.hpp"
-#include "ScreenManager.hpp"
+//#include "ScreenManager.hpp"
+#include "Game.hpp"
 
 bool init();
 void close();
@@ -102,32 +103,29 @@ int main()
     }
     else
     {
-        bool quit = false;
+        bool running = true;
 
         // SDL event handler
-        SDL_Event event;
+        //SDL_Event event;
 
         // settings
         unsigned char frame_count = 0;
         int spacing = 40;
         int speed = 15;
 
-        //Game game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, spacing);
-        ScreenManager screenManager = ScreenManager(SCREEN_WIDTH, SCREEN_HEIGHT);
+        Game game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, spacing);
+        //ScreenManager screenManager = ScreenManager(SCREEN_WIDTH, SCREEN_HEIGHT, gRenderer);
 
-        const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
+        //const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 
-        while(!quit)
+        // TODO: move game loop to run method in screen manager
+        while(running)
         {
-            // process event queue
-            while (SDL_PollEvent(&event) != 0)
-            {
-                if (event.type == SDL_QUIT) {quit = true;}
-                
-            }
             
-            quit = screenManager.run(gRenderer);
-
+            
+            //running = !screenManager.run();
+            running = !game.run(gRenderer, frame_count, speed);
+            frame_count += 1;
             // Render frame
             SDL_RenderPresent(gRenderer);
         }

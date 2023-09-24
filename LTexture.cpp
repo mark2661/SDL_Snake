@@ -14,6 +14,12 @@ LTexture::~LTexture()
 
 bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColour, TTF_Font* font, SDL_Renderer* renderer)
 {
+    // If texture already loaded return
+    if (mTexture != NULL)
+    {
+        return true;
+    }
+
     // delete pre-existing texture
     free();
 

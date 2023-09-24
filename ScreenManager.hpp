@@ -14,15 +14,27 @@ class GameScreen;
 
 class ScreenManager
 {
+    private:
+        uint16_t windowWidth;
+        uint16_t windowHeight;
+        SDL_Renderer* renderer = nullptr;
+        SDL_Event event;
+
     public:
         std::unordered_map<std::string, ScreenInterface *> screens;
 
         ScreenInterface* currentScreen = nullptr;
     
         ScreenManager();
-        ScreenManager(const uint16_t windowWidth, const uint16_t windowHeight);
+        ScreenManager(const uint16_t windowWidth, const uint16_t windowHeight, SDL_Renderer* renderer);
+        uint16_t getWindowWidth();
+        uint16_t getWindowHeight();
+        SDL_Renderer* getRenderer();
         void switchScreen(std::string screenCode);
-        bool run(SDL_Renderer* renderer);
+        //bool run(SDL_Renderer* renderer);
+        bool run();
+        bool runGame();
+        bool runMenu(const int mouseX, const int mouseY);
         ~ScreenManager();
 
 };

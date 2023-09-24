@@ -13,5 +13,5 @@ class GameScreen : public ScreenInterface
         GameScreen();
         GameScreen(const uint16_t windowWidth, const uint16_t windowHeight, const uint8_t gridSpacing=40);
         CustomReturnCode run(SDL_Renderer* renderer);
-
+        CustomReturnCode run(SDL_Renderer *renderer, const int mouseX, const int mouseY);
 };

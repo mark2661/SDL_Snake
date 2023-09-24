@@ -34,20 +34,27 @@ enum CustomReturnCode
 };
 
 
-
 struct CustomTextWrapper{
-    std::string text = "";
-    TTF_Font* font;
+    std::string text = "default text";
+    TTF_Font* font = nullptr;
     SDL_Color colour = {0x00, 0x00, 0x00}; // black
     LTexture texture;
-    SDL_Rect boundingRect;
+    SDL_Rect boundingRect = {-1, -1, -1, -1}; // value to signal the struct is uninitialised;
+    std::string test;
+    CustomReturnCode (*onClickFunctionPtr)() = nullptr;
+
 
     CustomTextWrapper();
     CustomTextWrapper(std::string text, TTF_Font *font, SDL_Color colour);
+    CustomTextWrapper(std::string text, TTF_Font *font, SDL_Color colour, CustomReturnCode (*onClickFunctionPtr)());
     void setFont(unsigned char fontSize);
+    void setBoundingRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
+    //const SDL_Rect* getBoundingRect();
     void renderText(const int x, const int y, SDL_Renderer* renderer);
-    void renderTextCentered(const uint16_t windowWidth, const uint16_t y, SDL_Renderer* renderer);
+    void renderTextHorizontallyCentered(const uint16_t windowWidth, const uint16_t y, SDL_Renderer* renderer);
+    void bindOnClick(CustomReturnCode (*funcPtr)());
     CustomReturnCode onClick();
+    CustomTextWrapper(const CustomTextWrapper &oldObject);
     ~CustomTextWrapper();
 };
 
