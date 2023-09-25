@@ -9,7 +9,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include "utils.hpp"
-//#include "ScreenManager.hpp"
 #include "Game.hpp"
 
 bool init();
@@ -17,6 +16,7 @@ void close();
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+#define FPS 60
 
 // Rendering Window
 SDL_Window* gWindow = nullptr;
@@ -56,6 +56,7 @@ bool init()
         {
             // create renderer for window
             gRenderer = SDL_CreateRenderer(gWindow, -1 , SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+            //gRenderer = SDL_CreateRenderer(gWindow, -1 , SDL_RENDERER_ACCELERATED);
 
             if (gRenderer == nullptr)
             {
@@ -106,28 +107,38 @@ int main()
         bool running = true;
 
         // SDL event handler
-        //SDL_Event event;
+        SDL_Event event;
 
         // settings
-        unsigned char frame_count = 0;
+        unsigned int frame_count = 0;
         int spacing = 40;
         int speed = 15;
 
         Game game = Game(SCREEN_WIDTH, SCREEN_HEIGHT, spacing);
-        //ScreenManager screenManager = ScreenManager(SCREEN_WIDTH, SCREEN_HEIGHT, gRenderer);
 
-        //const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
-
-        // TODO: move game loop to run method in screen manager
         while(running)
         {
-            
-            
-            //running = !screenManager.run();
+            Uint32 start = SDL_GetTicks();
+
+            // process event queue
+            while (SDL_PollEvent(&event) != 0)
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    close();
+                    return 0;
+                }
+            }
+
             running = !game.run(gRenderer, frame_count, speed);
-            frame_count += 1;
+
             // Render frame
             SDL_RenderPresent(gRenderer);
+            frame_count += 1;
+
+            // cap frame rate
+            Uint32 end = SDL_GetTicks();
+            SDL_Delay(floor((1000.0f/FPS) - (end - start)));
         }
     }
     close();
