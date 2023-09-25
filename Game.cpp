@@ -163,38 +163,49 @@ void Game::renderGame(SDL_Renderer* renderer)
 void Game::processInput()
 {
     const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-    if (currentKeyStates[SDL_SCANCODE_W])
-            {
-                this->snake.direction = {0, -1};
-            }
+    if (currentKeyStates[SDL_SCANCODE_P]) { this->pause = !this->pause; }
 
-            if (currentKeyStates[SDL_SCANCODE_S])
-            {
-                this->snake.direction = {0, 1};
-            }
+    // if game not paused process directional input
+    if (!this->pause)
+    {
+        if (currentKeyStates[SDL_SCANCODE_W])
+        {
+            this->snake.direction = {0, -1};
+        }
 
-            if (currentKeyStates[SDL_SCANCODE_A])
-            {
-                this->snake.direction = {-1, 0};
-            }
+        if (currentKeyStates[SDL_SCANCODE_S])
+        {
+            this->snake.direction = {0, 1};
+        }
 
-            if (currentKeyStates[SDL_SCANCODE_D])
-            {
-                this->snake.direction = {1, 0};
-            }
+        if (currentKeyStates[SDL_SCANCODE_A])
+        {
+            this->snake.direction = {-1, 0};
+        }
+
+        if (currentKeyStates[SDL_SCANCODE_D])
+        {
+            this->snake.direction = {1, 0};
+        }
+    }
+
 }
 
 bool Game::run(SDL_Renderer* renderer, const int frameCount, const int speed)
 {
     bool quitGame = false;
     processInput();
-    if (frameCount % speed == 0)
+    if (!this->pause)
     {
-        moveSnake();
-        // if collision with body detected collisionCheck will return true and game will exit
-        quitGame = collisionCheck();
+        if (frameCount % speed == 0)
+        {
+            moveSnake();
+            // if collision with body detected collisionCheck will return true and game will exit
+            quitGame = collisionCheck();
+        }
+        checkFoodConsumption();
     }
-    checkFoodConsumption();
+
     renderGame(renderer);
     return quitGame;
 }

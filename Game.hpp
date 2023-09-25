@@ -40,6 +40,7 @@ class Game
         int screenWidth;
         int screenHeight;
         int gridSpacing = 40;
+        bool pause = false;
 
     public:
         std::unordered_map<std::tuple<int, int>, int, hash_tuple> grid_map;
